@@ -1,0 +1,36 @@
+{
+  "manifest_version": 2,
+  "name": "Slack Groups",
+  "version": "0.0.0",
+  "author": "Phil Tsaryk",
+
+  "description": "",
+  "homepage_url": "https://github.com/phts/firefox-slack-groups",
+  "icons": {
+    "48": "icons/app.png"
+  },
+
+  "permissions": ["storage", "tabs"],
+
+  "applications": {
+    "gecko": {
+      "id": "slack-groups@phts",
+      "strict_min_version": "57.0"
+    }
+  },
+
+  "content_scripts": [
+    {
+      "matches": ["https://app.slack.com/*"],
+      "js": ["index.js"]
+    }
+  ],
+
+  "page_action": {
+    "browser_style": true,
+    "default_icon": "icons/button.png",
+    "default_title": "Groups",
+    "default_popup": "popup.html",
+    "show_matches": ["https://app.slack.com/*"]
+  }
+}
