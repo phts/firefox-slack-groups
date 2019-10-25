@@ -1,5 +1,5 @@
 function isGroupItem(name) {
-  return name.includes('=')
+  return name.startsWith('=')
 }
 
 function getListNode() {
@@ -25,11 +25,9 @@ function getNodes() {
 
 function syncList(list) {
   const {starred} = getNodes()
-
   const starredNames = starred.map(x => x.textContent.trim())
 
   const syncedList = list.filter(x => isGroupItem(x) || starredNames.includes(x))
-
   starredNames.forEach(x => {
     if (!syncedList.includes(x)) {
       syncedList.push(x)
