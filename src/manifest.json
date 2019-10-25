@@ -4,7 +4,7 @@
   "version": "0.0.0",
   "author": "Phil Tsaryk",
 
-  "description": "",
+  "description": "Organize your starred contacts easily",
   "homepage_url": "https://github.com/phts/firefox-slack-groups",
   "icons": {
     "48": "icons/app.png"
@@ -29,7 +29,7 @@
   "page_action": {
     "browser_style": true,
     "default_icon": "icons/button.png",
-    "default_title": "Groups",
+    "default_title": "Organize starred contacts",
     "default_popup": "popup.html",
     "show_matches": ["https://app.slack.com/*"]
   }
