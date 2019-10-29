@@ -75,6 +75,30 @@ function sendToPopup(list) {
   })
 }
 
+function fixScrollOnClick() {
+  const node = document.querySelector('.c-scrollbar__hider')
+  let scrollTop
+  node.addEventListener('mousedown', function() {
+    scrollTop = this.scrollTop
+
+    function onScroll(ev) {
+      ev.preventDefault()
+      this.scrollTop = scrollTop
+    }
+    node.addEventListener('scroll', onScroll)
+
+    function onWheel() {
+      node.removeEventListener('scroll', onScroll)
+    }
+    node.addEventListener('wheel', onWheel)
+
+    setTimeout(() => {
+      node.removeEventListener('scroll', onScroll)
+      node.removeEventListener('wheel', onWheel)
+    }, 1000)
+  })
+}
+
 async function run() {
   const storedList = await browser.storage.local.get()
   const initialList = storedList.list || []
@@ -82,6 +106,7 @@ async function run() {
   await saveList(syncedList)
   sendToPopup(syncedList)
   addGroups(syncedList)
+  fixScrollOnClick()
 }
 
 browser.runtime.onMessage.addListener(async function onSave({type, data}) {
