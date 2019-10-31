@@ -112,7 +112,7 @@ async function run() {
 browser.runtime.onMessage.addListener(async function onSave({type, data}) {
   if (type === 'save') {
     browser.runtime.onMessage.removeListener(onSave)
-    saveList(data)
+    await saveList(data)
     location.reload()
   }
 })
