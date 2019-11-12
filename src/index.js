@@ -2,6 +2,10 @@ function isGroupItem(name) {
   return name.startsWith('=')
 }
 
+function getItemName(node) {
+  return node.querySelector('.p-channel_sidebar__name').textContent.trim()
+}
+
 function getListNode() {
   return document.querySelector('div.p-channel_sidebar__static_list')
 }
@@ -25,7 +29,7 @@ function getNodes() {
 
 function syncList(list) {
   const {starred} = getNodes()
-  const starredNames = starred.map(x => x.textContent.trim())
+  const starredNames = starred.map(getItemName)
 
   const syncedList = list.filter(x => isGroupItem(x) || starredNames.includes(x))
   starredNames.forEach(x => {
@@ -59,7 +63,7 @@ function addGroups(list) {
         return el
       }
 
-      return starred.find(x => x.textContent.trim() === name)
+      return starred.find(x => getItemName(x) === name)
     })
     .filter(x => x)
   ;[...preItems, ...sortedList, ...postItems].forEach(x => {
