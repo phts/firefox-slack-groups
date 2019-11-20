@@ -12,22 +12,22 @@ function getListNode() {
 
 function getNodes() {
   const listEl = getListNode()
-  // console.log('listEl', listEl)
+  console.log('listEl', listEl)
   const nodes = Array.from(listEl.childNodes)
   const starredItemIndex = nodes.findIndex(x => x.textContent.trim() === 'Starred')
-  // console.log('starredItemIndex', starredItemIndex)
+  console.log('starredItemIndex', starredItemIndex)
   const starredListBegin = starredItemIndex + 2
-  // console.log('starredListBegin', starredListBegin)
+  console.log('starredListBegin', starredListBegin)
   const tmp = nodes.slice(starredListBegin)
-  // console.log('tmp', tmp)
+  console.log('tmp', tmp)
   const starredListEnd = tmp.findIndex(x => x.attributes['role'].value.trim() === 'presentation')
-  // console.log('starredListEnd', starredListEnd)
+  console.log('starredListEnd', starredListEnd)
   const starred = tmp.slice(0, starredListEnd)
-  // console.log('starred', starred)
+  console.log('starred', starred)
   const preItems = nodes.slice(0, starredListBegin)
   const postItems = nodes.slice(starredListBegin + starredListEnd)
-  // console.log('preItems', preItems)
-  // console.log('postItems', postItems)
+  console.log('preItems', preItems)
+  console.log('postItems', postItems)
   return {
     starred,
     preItems,
@@ -38,7 +38,7 @@ function getNodes() {
 function syncList(list) {
   const {starred} = getNodes()
   const starredNames = starred.map(getItemName)
-  // console.log('starredNames', starredNames)
+  console.log('starredNames', starredNames)
 
   const syncedList = list.filter(x => isGroupItem(x) || starredNames.includes(x))
   starredNames.forEach(x => {
@@ -58,7 +58,7 @@ function addGroups(list) {
   const {preItems, starred, postItems} = getNodes()
   const sortedList = list
     .map(name => {
-      // console.log('name', name)
+      console.log('name', name)
       if (isGroupItem(name)) {
         const text = document.createTextNode(name.replace(/=/g, ''))
         const el = document.createElement('DIV')
@@ -73,12 +73,12 @@ function addGroups(list) {
         return el
       }
 
-      // console.log('****', starred.find(x => x.textContent.trim() === name))
+      console.log('****', starred.find(x => getItemName(x) === name))
       return starred.find(x => getItemName(x) === name)
     })
     .filter(x => x)
-  // console.log('sortedList', sortedList)
-  // console.log('[...sortedList]', [...preItems, ...sortedList, ...postItems])
+  console.log('sortedList', sortedList)
+  console.log('[...sortedList]', [...preItems, ...sortedList, ...postItems])
   ;[...preItems, ...sortedList, ...postItems].forEach(x => {
     getListNode().appendChild(x)
   })
@@ -117,12 +117,12 @@ function fixScrollOnClick() {
 }
 
 async function run() {
-  // console.log('run')
+  console.log('run')
   const storedList = await browser.storage.local.get()
   const initialList = storedList.list || []
-  // console.log('initialList', initialList)
+  console.log('initialList', initialList)
   const syncedList = syncList(initialList)
-  // console.log('syncedList', syncedList)
+  console.log('syncedList', syncedList)
   await saveList(syncedList)
   sendToPopup(syncedList)
   addGroups(syncedList)
@@ -132,9 +132,9 @@ async function run() {
 browser.runtime.onMessage.addListener(async function onSave({type, data}) {
   if (type === 'save') {
     browser.runtime.onMessage.removeListener(onSave)
-    // console.log('save', data)
+    console.log('save', data)
     await saveList(data)
-    // console.log('location.reload')
+    console.log('location.reload')
     location.reload()
   }
 })
