@@ -50,8 +50,42 @@ function syncList(list) {
   return syncedList
 }
 
-async function saveList(list) {
-  await browser.storage.local.set({list})
+async function readStorage() {
+  const storage = await browser.storage.local.get()
+  if (typeof storage !== 'object') {
+    return {list: undefined, history: []}
+  }
+  const history = storage.history || []
+  const list = storage.list
+  if (Array.isArray(list)) {
+    // TODO: remove (backward compatibility with 0.1.x)
+    return {list: {value: list, timestamp: Date.now()}, history}
+  }
+  return {list, history}
+}
+
+async function writeStorage(storage) {
+  await browser.storage.local.set(storage)
+}
+
+async function saveList(value, opts = {}) {
+  const storage = await readStorage()
+  const list = {value, timestamp: Date.now()}
+  const history = storage.history
+  if (storage.list) {
+    if (
+      !opts.backupOnlyWhenChanged ||
+      JSON.stringify(value) !== JSON.stringify(storage.list.value)
+    ) {
+      history.unshift(storage.list)
+    }
+    if (history.length > 10) {
+      delete history[10]
+    }
+  }
+  const newStorage = {list, history}
+  await writeStorage(newStorage)
+  return newStorage
 }
 
 function addGroups(list) {
@@ -84,10 +118,24 @@ function addGroups(list) {
   })
 }
 
-function sendToPopup(list) {
-  browser.runtime.onMessage.addListener(({type}) => {
-    if (type === 'getList') {
-      browser.runtime.sendMessage({type, data: list})
+function connectToPopup(storage) {
+  browser.runtime.onMessage.addListener(async function onMessage({type, data}) {
+    if (type === 'getState') {
+      browser.runtime.sendMessage({type, data: storage})
+    }
+    if (type === 'save') {
+      browser.runtime.onMessage.removeListener(onMessage)
+      console.log('save', data)
+      await saveList(data)
+      console.log('location.reload')
+      location.reload()
+    }
+    if (type === 'restore') {
+      browser.runtime.onMessage.removeListener(onMessage)
+      console.log('restore', data)
+      console.log('restore', storage.history[data])
+      await saveList(storage.history[data].value, {backupOnlyWhenChanged: true})
+      location.reload()
     }
   })
 }
@@ -118,26 +166,16 @@ function fixScrollOnClick() {
 
 async function run() {
   console.log('run')
-  const storedList = await browser.storage.local.get()
-  const initialList = storedList.list || []
+  const storage = await readStorage()
+  const initialList = (storage.list || {}).value || []
   console.log('initialList', initialList)
   const syncedList = syncList(initialList)
   console.log('syncedList', syncedList)
-  await saveList(syncedList)
-  sendToPopup(syncedList)
-  addGroups(syncedList)
+  const newStorage = await saveList(syncedList, {backupOnlyWhenChanged: true})
+  connectToPopup(newStorage)
+  addGroups(newStorage.list.value)
   fixScrollOnClick()
 }
-
-browser.runtime.onMessage.addListener(async function onSave({type, data}) {
-  if (type === 'save') {
-    browser.runtime.onMessage.removeListener(onSave)
-    console.log('save', data)
-    await saveList(data)
-    console.log('location.reload')
-    location.reload()
-  }
-})
 
 window.addEventListener('load', async function onLoad() {
   window.removeEventListener('load', onLoad)

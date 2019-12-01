@@ -3,10 +3,24 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <style>
+      .actions {
+        display: flex;
+      }
+      .actions > * {
+        flex: 1 1 auto;
+      }
+    </style>
   </head>
   <body>
     <textarea id="list" cols="30" rows="30"></textarea>
-    <button id="save">Save and reload</button>
+    <div class="actions">
+      <button id="save">Save and reload</button>
+      <select id="restore">
+        <option>Restore</option>
+        <option disabled>──────────</option>
+      </select>
+    </div>
     <script src="popup.js"></script>
   </body>
 </html>
