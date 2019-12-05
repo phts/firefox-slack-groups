@@ -6,6 +6,8 @@
 
 Add groups into your started contact list in Slack!
 
+⚠ This is an experimental extension and is not stable yet. Use at your own risk.
+
 ## Usage
 
 <table>
@@ -14,3 +16,7 @@ Add groups into your started contact list in Slack!
   <td><img src="https://addons.cdn.mozilla.net/user-media/previews/full/227/227360.png" alt="Settings window"></td>
 </tr>
 </table>
+
+## Limitations
+
+Currently English locale is supported only ("Starred", "Drafts" labels).
