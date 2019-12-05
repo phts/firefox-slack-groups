@@ -48,12 +48,8 @@ async function readStorage() {
   if (typeof storage !== 'object') {
     return {list: undefined, history: []}
   }
-  const history = storage.history || []
   const list = storage.list
-  if (Array.isArray(list)) {
-    // TODO: remove (backward compatibility with 0.1.x)
-    return {list: {value: list, timestamp: Date.now()}, history}
-  }
+  const history = storage.history || []
   return {list, history}
 }
 
