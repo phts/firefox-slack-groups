@@ -1,20 +1,13 @@
-function isGroupItem(name) {
-  return name.startsWith('=')
-}
-
-function getItemName(node) {
-  return node.querySelector('.p-channel_sidebar__name').textContent.trim()
-}
-
-function getListNode() {
-  return document.querySelector('div.p-channel_sidebar__static_list')
-}
+const isGroupItem = name => name.startsWith('=')
+const getItemName = node => node.querySelector('.p-channel_sidebar__name').textContent.trim()
+const getListNode = () => document.querySelector('div.p-channel_sidebar__static_list')
+const isStarredTitleItem = node => node.textContent.trim() === 'Starred'
 
 function getNodes() {
   const listEl = getListNode()
   console.log('listEl', listEl)
   const nodes = Array.from(listEl.childNodes)
-  const starredItemIndex = nodes.findIndex(x => x.textContent.trim() === 'Starred')
+  const starredItemIndex = nodes.findIndex(isStarredTitleItem)
   console.log('starredItemIndex', starredItemIndex)
   const starredListBegin = starredItemIndex + 2
   console.log('starredListBegin', starredListBegin)
@@ -103,6 +96,7 @@ function addGroups(list) {
         el.style.height = '26px'
         el.style.justifyContent = 'center'
         el.setAttribute('role', 'listitem')
+        el.setAttribute('data-group', '')
         el.appendChild(text)
         return el
       }
@@ -116,6 +110,13 @@ function addGroups(list) {
   ;[...preItems, ...sortedList, ...postItems].forEach(x => {
     getListNode().appendChild(x)
   })
+}
+
+function clearGroups() {
+  const els = getListNode().querySelectorAll('[data-group]')
+  for (const el of els) {
+    el.remove()
+  }
 }
 
 function connectToPopup(storage) {
@@ -164,6 +165,31 @@ function fixScrollOnClick() {
   })
 }
 
+async function rebuildGroups() {
+  console.log('rebuildGroups')
+  clearGroups()
+  const storage = await readStorage()
+  addGroups(storage.list.value)
+  startObserver()
+}
+
+function startObserver() {
+  console.log('startObserver')
+  new MutationObserver((mutations, observer) => {
+    for (const mutation of mutations) {
+      if (mutation.type === 'childList') {
+        console.log('observer', mutation)
+        if (Array.prototype.find.call(mutation.addedNodes, isStarredTitleItem)) {
+          observer.disconnect()
+          setTimeout(rebuildGroups, 500)
+        }
+      }
+    }
+  }).observe(getListNode(), {
+    childList: true,
+  })
+}
+
 async function run() {
   console.log('run')
   const storage = await readStorage()
@@ -175,6 +201,7 @@ async function run() {
   connectToPopup(newStorage)
   addGroups(newStorage.list.value)
   fixScrollOnClick()
+  startObserver()
 }
 
 window.addEventListener('load', async function onLoad() {
