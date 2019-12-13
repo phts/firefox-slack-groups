@@ -5,22 +5,22 @@ const isStarredTitleItem = node => node.textContent.trim() === 'Starred'
 
 function getNodes() {
   const listEl = getListNode()
-  console.log('listEl', listEl)
+  console.debug('listEl', listEl)
   const nodes = Array.from(listEl.childNodes)
   const starredItemIndex = nodes.findIndex(isStarredTitleItem)
-  console.log('starredItemIndex', starredItemIndex)
+  console.debug('starredItemIndex', starredItemIndex)
   const starredListBegin = starredItemIndex + 2
-  console.log('starredListBegin', starredListBegin)
+  console.debug('starredListBegin', starredListBegin)
   const tmp = nodes.slice(starredListBegin)
-  console.log('tmp', tmp)
+  console.debug('tmp', tmp)
   const starredListEnd = tmp.findIndex(x => x.attributes['role'].value.trim() === 'presentation')
-  console.log('starredListEnd', starredListEnd)
+  console.debug('starredListEnd', starredListEnd)
   const starred = tmp.slice(0, starredListEnd)
-  console.log('starred', starred)
+  console.debug('starred', starred)
   const preItems = nodes.slice(0, starredListBegin)
   const postItems = nodes.slice(starredListBegin + starredListEnd)
-  console.log('preItems', preItems)
-  console.log('postItems', postItems)
+  console.debug('preItems', preItems)
+  console.debug('postItems', postItems)
   return {
     starred,
     preItems,
@@ -31,7 +31,7 @@ function getNodes() {
 function syncList(list) {
   const {starred} = getNodes()
   const starredNames = starred.map(getItemName)
-  console.log('starredNames', starredNames)
+  console.debug('starredNames', starredNames)
 
   const syncedList = list.filter(x => isGroupItem(x) || starredNames.includes(x))
   starredNames.forEach(x => {
@@ -81,7 +81,7 @@ function addGroups(list) {
   const {preItems, starred, postItems} = getNodes()
   const sortedList = list
     .map(name => {
-      console.log('name', name)
+      console.debug('name', name)
       if (isGroupItem(name)) {
         const text = document.createTextNode(name.replace(/=/g, ''))
         const el = document.createElement('DIV')
@@ -97,12 +97,12 @@ function addGroups(list) {
         return el
       }
 
-      console.log('****', starred.find(x => getItemName(x) === name))
+      console.debug('****', starred.find(x => getItemName(x) === name))
       return starred.find(x => getItemName(x) === name)
     })
     .filter(x => x)
-  console.log('sortedList', sortedList)
-  console.log('[...sortedList]', [...preItems, ...sortedList, ...postItems])
+  console.debug('sortedList', sortedList)
+  console.debug('[...sortedList]', [...preItems, ...sortedList, ...postItems])
   ;[...preItems, ...sortedList, ...postItems].forEach(x => {
     getListNode().appendChild(x)
   })
@@ -118,19 +118,20 @@ function clearGroups() {
 function connectToPopup(storage) {
   browser.runtime.onMessage.addListener(async function onMessage({type, data}) {
     if (type === 'getState') {
+      console.debug('getState', data)
       browser.runtime.sendMessage({type, data: storage})
     }
     if (type === 'save') {
       browser.runtime.onMessage.removeListener(onMessage)
-      console.log('save', data)
+      console.debug('save', data)
       await saveList(data)
-      console.log('location.reload')
+      console.debug('location.reload')
       location.reload()
     }
     if (type === 'restore') {
       browser.runtime.onMessage.removeListener(onMessage)
-      console.log('restore', data)
-      console.log('restore', storage.history[data])
+      console.debug('restore', data)
+      console.debug('restore', storage.history[data])
       await saveList(storage.history[data].value, {backupOnlyWhenChanged: true})
       location.reload()
     }
@@ -162,7 +163,7 @@ function fixScrollOnClick() {
 }
 
 async function rebuildGroups() {
-  console.log('rebuildGroups')
+  console.debug('rebuildGroups')
   clearGroups()
   const storage = await readStorage()
   addGroups(storage.list.value)
@@ -170,11 +171,11 @@ async function rebuildGroups() {
 }
 
 function startObserver() {
-  console.log('startObserver')
+  console.debug('startObserver')
   new MutationObserver((mutations, observer) => {
     for (const mutation of mutations) {
       if (mutation.type === 'childList') {
-        console.log('observer', mutation)
+        console.debug('observer', mutation)
         if (Array.prototype.find.call(mutation.addedNodes, isStarredTitleItem)) {
           observer.disconnect()
           setTimeout(rebuildGroups, 500)
@@ -187,12 +188,12 @@ function startObserver() {
 }
 
 async function run() {
-  console.log('run')
+  console.debug('run')
   const storage = await readStorage()
   const initialList = (storage.list || {}).value || []
-  console.log('initialList', initialList)
+  console.debug('initialList', initialList)
   const syncedList = syncList(initialList)
-  console.log('syncedList', syncedList)
+  console.debug('syncedList', syncedList)
   const newStorage = await saveList(syncedList, {backupOnlyWhenChanged: true})
   connectToPopup(newStorage)
   addGroups(newStorage.list.value)
@@ -201,6 +202,7 @@ async function run() {
 }
 
 window.addEventListener('load', async function onLoad() {
+  console.debug('onLoad')
   window.removeEventListener('load', onLoad)
   await run()
 })
