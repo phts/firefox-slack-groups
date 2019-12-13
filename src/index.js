@@ -201,8 +201,17 @@ async function run() {
   startObserver()
 }
 
+let haveRun = false
 window.addEventListener('load', async function onLoad() {
   console.debug('onLoad')
+  haveRun = true
   window.removeEventListener('load', onLoad)
   await run()
 })
+
+setTimeout(async () => {
+  console.debug('haveRun', haveRun)
+  if (!haveRun) {
+    await run()
+  }
+}, 10000)
