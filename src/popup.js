@@ -44,16 +44,33 @@ function updateRestoreElement(data) {
   })
 }
 
+function showError() {
+  document.getElementById('init-error-msg').style.display = 'block'
+  document.getElementById('list').style.display = 'none'
+}
+
 function fetchState() {
-  browser.runtime.onMessage.addListener(function handle({type, data}) {
+  let loaded
+
+  function handle({type, data}) {
     if (type === 'getState') {
       browser.runtime.onMessage.removeListener(handle)
 
+      loaded = true
       updateListElement(data)
       updateRestoreElement(data)
     }
-  })
+  }
+
+  browser.runtime.onMessage.addListener(handle)
   send('getState')
+
+  setTimeout(() => {
+    if (!loaded) {
+      browser.runtime.onMessage.removeListener(handle)
+      showError()
+    }
+  }, 500)
 }
 
 fetchState()
