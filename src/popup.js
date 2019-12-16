@@ -50,27 +50,23 @@ function showError() {
 }
 
 function fetchState() {
-  let loaded
-
   function handle({type, data}) {
     if (type === 'getState') {
-      browser.runtime.onMessage.removeListener(handle)
+      clearTimeout(errorTimer)
 
-      loaded = true
+      browser.runtime.onMessage.removeListener(handle)
       updateListElement(data)
       updateRestoreElement(data)
     }
   }
 
+  const errorTimer = setTimeout(() => {
+    browser.runtime.onMessage.removeListener(handle)
+    showError()
+  }, 500)
+
   browser.runtime.onMessage.addListener(handle)
   send('getState')
-
-  setTimeout(() => {
-    if (!loaded) {
-      browser.runtime.onMessage.removeListener(handle)
-      showError()
-    }
-  }, 500)
 }
 
 fetchState()
