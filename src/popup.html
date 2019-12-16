@@ -5,27 +5,45 @@
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <style>
       body {
-        overflow-y: hidden;
-        width: 300px;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        min-height: 200px;
+        min-width: 300px;
+        overflow: hidden;
+      }
+      .list {
+        flex: auto;
+        height: 450px;
+        max-height: 550px;
+        max-width: 550px;
+        min-width: 100%;
+        outline: none;
       }
       .actions {
         display: flex;
       }
       .actions > * {
-        flex: 1 1 auto;
+        flex: auto;
       }
-      #init-error-msg {
+      .error-msg {
         display: none;
-        margin: 0 auto;
+        padding: 0 2em;
+        width: 300px;
+      }
+      .error-msg__header {
+        font-size: 150%;
+        text-align: center;
       }
     </style>
   </head>
   <body>
-    <div id="init-error-msg">
-      <p>😕 The plugin has not been started yet or has crashed.</p>
+    <div id="init-error-msg" class="error-msg">
+      <p class="error-msg__header">😕</p>
+      <p>The plugin has not been started yet or has crashed.</p>
       <p>Please wait for a while or refresh the page.</p>
     </div>
-    <textarea id="list" cols="30" rows="30"></textarea>
+    <textarea id="list" class="list" wrap="off"></textarea>
     <div id="actions" class="actions">
       <button id="save">Save and reload</button>
       <select id="restore">
