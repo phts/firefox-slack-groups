@@ -44,12 +44,17 @@ function syncList(list) {
 }
 
 async function readStorage() {
+  console.debug('readStorage')
   const storage = await browser.storage.local.get()
+  console.debug('readStorage', 'storage', storage)
+  console.debug('readStorage', "typeof storage !== 'object'", typeof storage !== 'object')
   if (typeof storage !== 'object') {
     return {list: undefined, history: []}
   }
   const list = storage.list
+  console.debug('readStorage', 'list', list)
   const history = storage.history || []
+  console.debug('readStorage', 'history', history)
   return {list, history}
 }
 
@@ -190,6 +195,7 @@ function startObserver() {
 async function run() {
   console.debug('run')
   const storage = await readStorage()
+  console.debug('storage', storage)
   const initialList = (storage.list || {}).value || []
   console.debug('initialList', initialList)
   const syncedList = syncList(initialList)
@@ -202,7 +208,7 @@ async function run() {
 }
 
 async function onLoad() {
-  console.debug('load')
+  console.debug('load', fallbackTimer)
   clearTimeout(fallbackTimer)
   window.removeEventListener('load', onLoad)
   await run()
