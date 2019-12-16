@@ -201,17 +201,12 @@ async function run() {
   startObserver()
 }
 
-let haveRun = false
-window.addEventListener('load', async function onLoad() {
-  console.debug('onLoad')
-  haveRun = true
+async function onLoad() {
+  console.debug('load')
+  clearTimeout(fallbackTimer)
   window.removeEventListener('load', onLoad)
   await run()
-})
+}
 
-setTimeout(async () => {
-  console.debug('haveRun', haveRun)
-  if (!haveRun) {
-    await run()
-  }
-}, 10000)
+const fallbackTimer = setTimeout(onLoad, 10000)
+window.addEventListener('load', onLoad)
