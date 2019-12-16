@@ -47,6 +47,7 @@ function updateRestoreElement(data) {
 function showError() {
   document.getElementById('init-error-msg').style.display = 'block'
   document.getElementById('list').style.display = 'none'
+  document.getElementById('actions').style.display = 'none'
 }
 
 function fetchState() {
