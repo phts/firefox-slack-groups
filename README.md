@@ -10,13 +10,23 @@ Add groups into your started contact list in Slack!
 
 ## Usage
 
+1. Open Slack in the browser
+2. Click 👾 icon in the address bar
+3. In the opened text area you can:
+
+    - add items starting with equals sign (`=`) — such items will be converted to group names
+    - sort lines as you want
+
+4. Click _Save and reload_ button
+5. Check out your new contact list 🙃
+
 <table>
 <tr>
-  <td><img src="https://addons.cdn.mozilla.net/user-media/previews/full/227/227359.png" alt="Slack groups in action"></td>
-  <td><img src="https://addons.cdn.mozilla.net/user-media/previews/full/227/227360.png" alt="Settings window"></td>
+  <td><img src="https://addons.cdn.mozilla.net/user-media/previews/full/227/227359.png" alt="Slack groups in action" width="50%"></td>
+  <td><img src="https://addons.cdn.mozilla.net/user-media/previews/full/227/227360.png" alt="Settings window" width="50%"></td>
 </tr>
 </table>
-
+  
 ## Limitations
 
 Currently English locale is supported only ("Starred", "Drafts" labels).
