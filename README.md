@@ -4,9 +4,19 @@
 [![Mozilla Add-on](https://img.shields.io/amo/stars/slack-groups.svg)](https://addons.mozilla.org/firefox/addon/slack-groups/reviews/)
 [![Mozilla Add-on](https://img.shields.io/amo/users/slack-groups.svg)](https://addons.mozilla.org/firefox/addon/slack-groups/)
 
+---
+
+:warning: :warning: :warning:
+
+Not working anymore :-(
+
+Slack changed a way how it places elements in the sidebar (`position: absolute`), so now it is hard to do anything with that, unfortunately.
+
+---
+
 Add groups into your started contact list in Slack!
 
-⚠ This is an experimental extension and is not stable yet. Use at your own risk.
+:warning: This is an experimental extension and is not stable yet. Use at your own risk.
 
 ## Usage
 
